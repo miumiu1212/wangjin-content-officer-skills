@@ -110,3 +110,105 @@
 - 字数限制：员工自定义风格描述不超过 200 字
 - 安全过滤：若员工输入的风格描述包含违规导向（如「承诺收益」「诱导跟风」），系统提示「该风格描述可能涉及合规风险，请调整」
 - 不持久化：本期自定义风格不保存到员工画像，每次使用需重新输入
+
+---
+
+## 本人历史风格画像
+
+### 触发条件
+
+员工在 Step 4 点击「本人历史风格」后进入风格画像提取流程。
+
+### 输入方式
+
+| 方式 | 说明 | 状态 |
+|------|------|------|
+| 链接输入 | 员工粘贴 1-5 条历史发布内容 URL | ✅ 可用 |
+| 文本粘贴 | 员工直接粘贴 1-5 篇文章正文 | ✅ 可用 |
+| 数据库拉取 | 按账号自动拉取历史内容 | 🔒 待开发，接口预留 |
+
+### 分析维度
+
+Agent 读取员工提供的内容样本，从 5 个维度提取风格画像：
+
+```json
+{
+  "tone": "口语化 + 轻微幽默",
+  "sentence_style": {
+    "avg_length": "15-20 字",
+    "short_sentence_heavy": true,
+    "rhetorical_questions": "适度"
+  },
+  "vocabulary": {
+    "jargon_density": "低",
+    "emoji_frequency": "1-2 个/段",
+    "colloquial_words": "高频"
+  },
+  "structure": {
+    "opening": "开门见山",
+    "paragraph_length": "中等",
+    "ending": "生活化总结 + 互动引导"
+  },
+  "emotion": "客观 + 共情"
+}
+```
+
+### 风格画像 Prompt 注入
+
+员工确认使用历史风格后，将画像转化为 prompt 指令注入文章生成环节：
+
+```
+请按照以下风格画像撰写内容：
+- 语气基调：{tone}
+- 句式特征：平均句长 {sentence_style.avg_length}，短句为主
+- 用词偏好：术语密度 {vocabulary.jargon_density}，emoji {vocabulary.emoji_frequency}，口语化 {vocabulary.colloquial_words}
+- 结构习惯：开头 {structure.opening}，结尾 {structure.ending}
+- 情感倾向：{emotion}
+```
+
+### 风格画像保存格式
+
+文件路径：`drafts/{员工ID}/style-profiles/style-profile-{YYYYMMDD}-{NNN}.md`
+
+```markdown
+# 历史风格画像
+
+**创建时间**: 2026-08-20 14:30
+**样本来源**: 3 篇内容（抖音 2 篇、小红书 1 篇）
+**画像摘要**: 口语化 + 轻微幽默，短句为主，术语少，开门见山
+
+---
+
+## 语气基调
+{tone}
+
+## 句式特征
+- 平均句长: {avg_length}
+- 短句为主: {short_sentence_heavy}
+- 修辞偏好: {rhetorical_questions}
+
+## 用词偏好
+- 术语密度: {jargon_density}
+- emoji 频率: {emoji_frequency}
+- 口语词: {colloquial_words}
+
+## 结构习惯
+- 开头方式: {opening}
+- 段落长度: {paragraph_length}
+- 结尾方式: {ending}
+
+## 情感倾向
+{emotion}
+
+---
+
+## 原始样本
+{附上员工提供的原始内容，便于后续比对}
+```
+
+### 多画像管理
+
+- 员工可保存多个风格画像（如抖音账号一个、小红书账号一个）
+- Step 4 展示时列出所有已保存画像，标注来源平台和创建时间
+- 支持删除、重新生成、手动编辑
+- 每次使用历史风格后更新「上次使用」标记
