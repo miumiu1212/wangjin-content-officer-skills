@@ -1,0 +1,38 @@
+name: 网金内容官
+display_name: 网金内容官
+description: 券商内容生产Agent，覆盖热点获取、选题推荐、大纲生成、文章输出、合规自检全流程，支持抖音/视频号/小红书多平台。
+version: 1.0
+author: miumiu1212
+tags:
+  - 互联网金融
+  - 券商运营
+  - 内容生产
+  - 文案生成
+  - 合规审核
+workspace: ./wangjin-content-workspace
+skills:
+  - name: 网金内容官
+    path: ./网金内容官
+    type: main
+  - name: 今日热点
+    path: ./今日热点
+    type: sub
+  - name: 选题推荐
+    path: ./选题推荐
+    type: sub
+  - name: 生成文章
+    path: ./生成文章
+    type: sub
+tools:
+  - file_reader
+  - web_search
+trigger_mode: keyword
+trigger_keywords:
+  - 今日热点
+  - 选题
+  - 文案
+  - 大纲
+  - 生成文章
+  - 内容生产
+  - 财联社
+disable_modules: []
